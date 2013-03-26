@@ -44,18 +44,22 @@
     if(self)
     {
         self.isTouchEnabled = YES;
-               
+        
+        //Add the scroll view and make ourselves the delegate
         self.scrollView = [[[UIScrollView alloc] init] autorelease];
-        self.scrollView .delegate = self;
-        self.scrollView .hidden = YES;
+        self.scrollView.delegate = self;
+        self.scrollView.hidden = YES;
         [[[CCDirector sharedDirector] view] addSubview:self.scrollView ];
         
-        [self.scrollView .panGestureRecognizer setCancelsTouchesInView:YES];
-                
+        //Don't pass on drag gestures
+        [self.scrollView.panGestureRecognizer setCancelsTouchesInView:YES];
+        
+        //Add the dummy view so we can control the frame of the gestureRecognizer
         self.dummyView = [[[UIView alloc] init] autorelease];
-        [self.dummyView addGestureRecognizer:self.scrollView .panGestureRecognizer];
+        [self.dummyView addGestureRecognizer:self.scrollView.panGestureRecognizer];
         [[[CCDirector sharedDirector] view] addSubview:self.dummyView];
         
+        //Add a subnode to move around so we can use the offset of UIScrollView
         self.subnode = [[CCNode alloc] init];
         [super addChild:self.subnode];
     }
@@ -74,11 +78,11 @@
 {
     [super onExit];
     
-    [self.dummyView removeGestureRecognizer:self.scrollView .panGestureRecognizer];
+    [self.dummyView removeGestureRecognizer:self.scrollView.panGestureRecognizer];
     [self.dummyView removeFromSuperview];
     
-    [self.scrollView  setDelegate:NULL];
-    [self.scrollView  removeFromSuperview];
+    [self.scrollView setDelegate:NULL];
+    [self.scrollView removeFromSuperview];
     self.scrollView = nil;
 }
 
@@ -90,7 +94,7 @@
     
     CGRect rect = CGRectMake(frame.origin.x, s.height - frame.size.height - frame.origin.y, frame.size.width, frame.size.height);
     
-    self.scrollView .frame = rect;
+    self.scrollView.frame = rect;
     self.dummyView.frame = rect;
 }
 
