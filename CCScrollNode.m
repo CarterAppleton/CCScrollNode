@@ -18,6 +18,8 @@
 @property (nonatomic, assign) UIView* dummyView;
 @property (nonatomic, assign) UIScrollView* scrollView;
 
+@property (nonatomic, assign) NSTimer* timer;
+
 @end
 
 @implementation CCScrollNode
@@ -110,14 +112,31 @@
 
 #pragma mark UIScrollViewDelegate
 
+- (void) animate:(NSTimer *)timer
+{
+    [[CCDirector sharedDirector] drawScene];
+    
+    if(!self.scrollView.isDragging && !self.scrollView.isDecelerating)
+    {
+        [self.timer invalidate];
+        self.timer = nil;
+    }
+}
+
+- (void) scrollViewWillBeginDragging:(UIScrollView *)scrollView
+{
+    if(!self.timer)
+    {
+        self.timer = [NSTimer timerWithTimeInterval:[[CCDirector sharedDirector] animationInterval] target:self selector:@selector(animate:) userInfo:nil repeats:YES];
+        [[NSRunLoop currentRunLoop] addTimer:self.timer forMode:UITrackingRunLoopMode];
+    }
+}
+
 - (void) scrollViewDidScroll:(UIScrollView *)scrollView
 {
     CGPoint offset = ccp(-scrollView.contentOffset.x,scrollView.contentOffset.y);
     self.subnode.position = offset;
     
-    //Force the scene to draw- UIScrollView inturrupts the drawing thread
-    [[CCDirector sharedDirector] drawScene];
-                         
     if(self.delegate)
         [self.delegate ccScrollNode:self didScrollWithOffset:offset];
 }
